@@ -120,7 +120,7 @@ namespace ply{
                     return "std::size_t"sv;
                 }
             }();
-        throw std::runtime_error(fmt::format("Can not convert {:s} to {:s}", std::quoted(text), type_string));
+        throw std::runtime_error(fmt::format("Can not convert {:?} to {:s}", text, type_string));
     }
 
     template <scalar_value T>
@@ -470,7 +470,7 @@ namespace ply{
             auto const iter = find_property(name);
             if(iter == properties_.end()){
                 throw std::runtime_error(fmt::format(
-                    "PLY element {:s} contains no property {:s}", std::quoted(name_), std::quoted(name)));
+                    "PLY element {:?} contains no property {:?}", name_, name));
             }
             return std::size_t(iter - properties_.begin());
         }
@@ -503,8 +503,8 @@ namespace ply{
             auto const values = std::get_if<T>(properties_[index]);
             if(values == nullptr){
                 throw std::runtime_error(fmt::format(
-                    "PLY element {:s} property {:s} accessed as {:s} but its type is {:s}",
-                    std::quoted(name_), std::quoted(property_name(index)), as_string<T>(),
+                    "PLY element {:?} property {:?} accessed as {:s} but its type is {:s}",
+                    name_, property_name(index), as_string<T>(),
                     property_type_name(index)));
             }
         }
@@ -584,7 +584,7 @@ namespace ply{
         std::size_t element_index(std::string_view const name)const{
             auto const iter = find_element(name);
             if(iter == elements_.end()){
-                throw std::runtime_error(fmt::format("PLY contains no element {:s}", std::quoted(name)));
+                throw std::runtime_error(fmt::format("PLY contains no element {:?}", name));
             }
             return std::size_t(iter - elements_.begin());
         }

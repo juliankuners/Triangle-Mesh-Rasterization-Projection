@@ -1,8 +1,10 @@
 #pragma once
 
-#include "bitmap/bitmap.hpp"
-#include "bitmap/pixel.hpp"
-#include "bitmap/masked_pixel.hpp"
+// this is a modified version of image_format_png found in lib bitmap
+
+#include "../bitmap.hpp"
+#include "../pixel.hpp"
+#include "../masked_pixel.hpp"
 
 #include <boost/endian.hpp>
 
