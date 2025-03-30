@@ -21,3 +21,9 @@ git clone https://github.com/QBV-tu-ilmenau/Triangle-Mesh-Rasterization-Projecti
 
 - [libpng](http://www.libpng.org/pub/png/libpng.html)
 - No longer necessary: Now the [bitmap](https://github.com/bebuch/bitmap) lib is part of the project.
+
+### CUDA
+
+- [NVCC](https://docs.nvidia.com/cuda/)
+- [CUDA Runtime](https://docs.nvidia.com/cuda/)
+- [CCCL](https://github.com/NVIDIA/cccl)
