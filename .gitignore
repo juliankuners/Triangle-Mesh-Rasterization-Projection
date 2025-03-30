@@ -13,3 +13,8 @@ cmake_install.cmake
 Makefile
 CMakeFiles
 build
+
+*.code-workspace
+/.vscode
+.direnv/
+/result
