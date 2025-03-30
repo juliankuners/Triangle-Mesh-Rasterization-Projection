@@ -35,17 +35,38 @@ Saving as PNG is lossy! The output is always a 16 bit grayscale image with alpha
 
 See [libraries](doc/setup.md)
 
-## Usage
+## How to build
 
+[CMake](https://gitlab.kitware.com/cmake/cmake) is used to build the project. Additionally, it is recommended to use [Nixpkgs](https://github.com/NixOS/nixpkgs) to deploy dependencies.
+
+### How to install Nix
+Either use the [NixOS](https://nixos.org/) Linux distribution or install Nix directly on your Linux distribution of choice. You may need to start the daemon or simply restart the system.
+```bash
+sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
+
+### How to build in a Nix development shell
+A Nix development shell can be used to build the project. Additionally, the use of [nix-direnv](https://github.com/nix-community/nix-direnv) allows for easy integration into the terminal or an IDE such as VSCode.
+```bash
+nix develop
 mkdir build
 cd build
 cmake ..
-make
+make -j
+./ply2image --help
+exit # exit the nix develop shell
 ```
 
+### How to build and install with Nix
+This project is packaged using Nix flakes and Nixpkgs. Run the following to build the project:
+```bash
+nix build
 ```
-./ply2image --help
+The result will be located in the directory `result`. Please note that Nix built programs are meant to be distributed as packages and not as standalone binaries. This is due to the pure way dynamic libraries are resolved at runtime in Nix.
+
+Run the following to install the project:
+```bash
+nix profile install
 ```
 
 ## Licence
