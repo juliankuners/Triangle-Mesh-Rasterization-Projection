@@ -10,6 +10,8 @@
   pngpp,
   argparse,
   boost,
+
+  cudaPackages,
 }:
 
 stdenv.mkDerivation {
@@ -28,15 +30,25 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     # build tools and compilers
     cmake
+    # hooks
+    autoAddDriverRunpath # add impure nvidia driver dynamic libraries to RPATH
   ];
 
   buildInputs = [
+    # CUDA compiler and libraries
+    cudaPackages.cuda_nvcc
+    cudaPackages.cuda_cudart
+    cudaPackages.cuda_cccl
     # C++ libraries
     fmt
     zlib
     pngpp
     argparse
     boost
+  ];
+
+  cmakeFlags = [
+    "-DCMAKE_CUDA_ARCHITECTURES=75"
   ];
 
   installPhase = ''

@@ -31,6 +31,8 @@ By default, the output image is stored in BBF file format with 64-bit floating p
 
 Saving as PNG is lossy! The output is always a 16 bit grayscale image with alpha channel. The pixel values range is truncated to 0 to 65535, no overflow or underflow takes place! All pixel values are rounded half up to integers. Fixed point values can be emulated via the value scaling. For example, to emulate 4 binary decimal places, the scaling must be set to 16 (=2^4). However, this information is not stored in the image! So when reading the PNG file later, you have to take care by yourself to interpret the values as fixed-point numbers again!
 
+By appending `--cuda`, a CUDA accelerated implementation of the algorithm is dispatched on a Nvidia GPU.
+
 ## Required libraries
 
 See [libraries](doc/setup.md)
@@ -46,12 +48,12 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
 
 ### How to build in a Nix development shell
-A Nix development shell can be used to build the project. Additionally, the use of [nix-direnv](https://github.com/nix-community/nix-direnv) allows for easy integration into the terminal or an IDE such as VSCode.
+A Nix development shell can be used to build the project. Additionally, the use of [nix-direnv](https://github.com/nix-community/nix-direnv) allows for easy integration into the terminal or an IDE such as VSCode. The development shell must be invoked impure due to the [NixGL](https://github.com/nix-community/nixGL) dependency that resolves the corresponding Nvidia driver dynamic libraries from Nixpkgs.
 ```bash
-nix develop
+nix develop --impure # enter the nix develop shell
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_CUDA_ARCHITECTURES=75 ..
 make -j
 ./ply2image --help
 exit # exit the nix develop shell
@@ -68,6 +70,12 @@ Run the following to install the project:
 ```bash
 nix profile install
 ```
+
+Additionally, on non-NixOS Linux distributions, the dynamic libraries of the Nvidia driver must be installed from Nixpkgs. Otherwise, a stub implementation is used that simply won't find Nvidia devices at runtime. This can be done by running the following in the project root directory:
+```bash
+sudo nix build --out-link /run/opengl-driver .#nvidia --impure
+```
+Please note that this must be repeated every time the Nvidia driver is updated.
 
 ## Licence
 

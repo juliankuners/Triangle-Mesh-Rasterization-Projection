@@ -12,6 +12,7 @@
 #include "bitmap/binary_write.hpp"
 #include "ply2image/argparse.hpp"
 #include "ply2image/tmrp.hpp"
+#include "ply2image/cuda/tmrp.cuh"
 
 template<typename T, typename... Args>
 struct FirstType {
@@ -137,6 +138,10 @@ int main(int argc, char** argv)try{
         .help("all pixel values are added with value-post-scale-offset after scaling")
         .scan<'g', double>()
         .default_value(static_cast<double>(0.));
+    program.add_argument("--cuda")
+        .help("use CUDA for tmrp interpolation")
+        .implicit_value(true)
+        .default_value(false);
 
 
     try{
@@ -196,6 +201,8 @@ int main(int argc, char** argv)try{
     auto const x_post_scale = program.get<double>("--x-post-scale-offset");
     auto const y_post_scale = program.get<double>("--y-post-scale-offset");
     auto const v_post_scale = program.get<double>("--value-post-scale-offset");
+
+    auto const cuda_enabled = program.get<bool>("--cuda");
 
     // load file
     ply::ply data;
@@ -337,6 +344,18 @@ int main(int argc, char** argv)try{
                 std::visit([=](auto const& v){ convert(set_ry, v); }, data.values(*yr_element, *yr_property));
             }
 
+            if constexpr (std::is_same_v<Point, raster_point>) {
+                if (cuda_enabled) {
+                    if constexpr (std::is_same_v<typename FirstType<RasterFilter...>::type, min_value_filter>) {
+                        return tmrpcuda::to_image_filter_min(width, height, points);
+                    } else if constexpr (std::is_same_v<typename FirstType<RasterFilter...>::type, max_value_filter>) {
+                        return tmrpcuda::to_image_filter_max(width, height, points);
+                    } else if constexpr (std::is_same_v<typename FirstType<RasterFilter...>::type, none_filter>) { 
+                        return tmrpcuda::to_image_filter_none(width, height, points);
+                    }
+                }
+            }
+
             // convert list to image
             return to_image<Point>(width, height, points, raster_filter ...);
         };
@@ -393,4 +412,3 @@ int main(int argc, char** argv)try{
     fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "Error: {:s}\n", error.what());
     return 2;
 }
-
